@@ -1,0 +1,29 @@
+module thermostat(
+input [7:0] temp,
+input [7:0] set_temp,
+input clk,
+output reg heat_on,
+output reg cool_on
+);
+
+parameter TOLERANCE = 3;
+
+always @(posedge clk) begin
+
+if (temp < (set_temp - TOLERANCE)) begin
+    heat_on <= 1;
+    cool_on <= 0;
+end
+
+else if (temp > (set_temp + TOLERANCE)) begin
+    heat_on <= 0;
+    cool_on <= 1;
+end
+
+else begin
+    heat_on <= 0;
+    cool_on <= 0;
+end
+end
+
+endmodule
