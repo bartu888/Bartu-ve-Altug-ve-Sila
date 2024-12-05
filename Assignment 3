@@ -1,0 +1,14 @@
+module thermostat(
+    input [7:0] temp,      
+    input [7:0] set_temp,   
+    output heat_on,         
+    output cool_on         
+);
+
+    parameter TOLERANCE = 3; 
+
+    
+    assign heat_on = (temp < (set_temp - TOLERANCE)) ? 1 : 0; 
+    assign cool_on = (temp > (set_temp + TOLERANCE)) ? 1 : 0; 
+
+endmodule
