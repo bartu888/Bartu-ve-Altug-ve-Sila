@@ -1,0 +1,33 @@
+module thermostat(
+    input wire clk,          // Clock signal
+    input wire reset,        // Reset signal
+    input wire [7:0] temp,   // Current temperature
+    input wire [7:0] set_temp, // Desired temperature
+    input wire [7:0] TOLERANCE, // Tolerance value
+    output reg heat_on,      // Heating control signal
+    output reg cool_on       // Cooling control signal
+);
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            heat_on <= 0;
+            cool_on <= 0;
+        end else begin
+            if (temp < set_temp - TOLERANCE) begin
+                // Heating is required
+                heat_on <= 1;
+                cool_on <= 0;
+            end else if (temp > set_temp + TOLERANCE) begin
+                // Cooling is required
+                heat_on <= 0;
+                cool_on <= 1;
+            end else begin
+                // Comfortable range
+                heat_on <= 0;
+                cool_on <= 0;
+            end
+        end
+    end
+
+endmodule
+
