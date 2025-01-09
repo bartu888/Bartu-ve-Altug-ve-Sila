@@ -1,0 +1,78 @@
+// Submodule: Clock Divider
+module clock_divider(
+    input clk_in,
+    input rst,
+    output reg clk_out
+);
+    parameter DIV_FACTOR = 50000000; //1hz to 500MHz
+
+    reg [31:0] counter;
+
+    always @(posedge clk_in or posedge rst) begin
+        if (rst) begin
+            counter <= 0;
+            clk_out <= 0;
+        end else begin
+            if (counter == (DIV_FACTOR - 1)) begin
+                counter <= 0;
+                clk_out <= ~clk_out;
+            end else begin
+                counter <= counter + 1;
+            end
+        end
+    end
+endmodule
+
+// Submodule: Temperature Sensor 
+module temp_sensor(
+    input clk,
+    input rst,
+    output reg [7:0] temp_out
+);
+    reg [7:0] temp;
+
+    always @(posedge clk or posedge rst) begin
+        if (rst)
+            temp <= 8'd20; 
+        else
+            temp <= temp + 1; 
+    end
+
+    assign temp_out = temp;
+endmodule
+
+// Top Module
+module top_thermostat(
+    input clk,
+    input rst,
+    input [7:0] set_temp,
+    output heat_on,
+    output cool_on
+);
+    wire clk_div;
+    wire [7:0] current_temp;
+
+    // instantiate clock divider
+    clock_divider #(50000000) clk_div_inst (
+        .clk_in(clk),
+        .rst(rst),
+        .clk_out(clk_div)
+    );
+
+    // instantiate temperature sensor
+    temp_sensor temp_sensor_inst (
+        .clk(clk_div),
+        .rst(rst),
+        .temp_out(current_temp)
+    );
+
+    // instantiate thermostat
+    thermostat thermostat_inst (
+        .temp(current_temp),
+        .set_temp(set_temp),
+        .clk(clk_div),
+        .heat_on(heat_on),
+        .cool_on(cool_on)
+    );
+
+endmodule
